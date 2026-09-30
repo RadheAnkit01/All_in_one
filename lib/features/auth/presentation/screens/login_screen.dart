@@ -1,3 +1,4 @@
+import 'package:all_in_one/core/errors/failure.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -53,8 +54,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           );
         },
         error: (error, stackTrace) {
+          final message = error is Failure
+              ? error.message
+              : "something went wrong";
+
           ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(error.toString())));
+              .showSnackBar(SnackBar(content: Text(message)));
         },
       );
     });

@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final appConfigProvider = Provider<AppConfig>((ref) {
   return const AppConfig(
     appName: 'Architecture Lab',
-    baseUrl: 'https://example.com/api',
+    baseUrl: 'http://localhost:8080/api/v1',
   );
 });
 

@@ -15,7 +15,7 @@ class User {
   final String? email;
   final String? fname;
   final String? lname;
-  final Long? selectedCourseId;
+  final int? selectedCourseId;
   final String? countryCode;
   final String? gender;
 }

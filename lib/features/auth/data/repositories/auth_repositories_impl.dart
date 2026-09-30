@@ -4,8 +4,7 @@ import 'package:all_in_one/features/auth/domain/entities/auth_session.dart';
 import 'package:all_in_one/features/auth/domain/repositories/auth_repositories.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  AuthRepositoryImpl({required AuthRemoteDataSource remoteDataSource})
-    : _remoteDataSource = remoteDataSource;
+  AuthRepositoryImpl({required this._remoteDataSource});
 
   final AuthRemoteDataSource _remoteDataSource;
 

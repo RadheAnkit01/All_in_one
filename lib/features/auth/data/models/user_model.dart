@@ -18,7 +18,7 @@ class UserModel {
   final String gender;
   final String countryCode;
   final String fullPhoneNumber;
-  final Long courseId;
+  final int courseId;
   final String role;
   final String createdAt;
   final String updatedAt;
@@ -43,7 +43,7 @@ class UserModel {
     String? gender,
     String? countryCode,
     String? fullPhoneNumber,
-    Long? courseId,
+    int? courseId,
     String? role,
     String? createdAt,
     String? updatedAt,

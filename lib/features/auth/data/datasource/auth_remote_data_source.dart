@@ -3,12 +3,12 @@ import 'package:all_in_one/features/auth/data/models/login_request_model.dart';
 import 'package:all_in_one/features/auth/data/models/login_response_model.dart';
 
 class AuthRemoteDataSource {
-  AuthRemoteDataSource({required DioClient dioClient}) : _dioClient = dioClient;
+  AuthRemoteDataSource({required this._dioClient});
 
   final DioClient _dioClient;
 
   Future<LoginResponseModel> login(LoginRequestModel request) async {
-    final response = await _dioClient.dio.post(
+    final response = await _dioClient.post<Map<String, dynamic>>(
       '/auth/login',
       data: request.toJson(),
     );

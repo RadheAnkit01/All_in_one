@@ -57,7 +57,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           final message = error is Failure
               ? error.message
               : "something went wrong";
-
+          debugPrint("ErrorInLoginScreen : $error");
           ScaffoldMessenger.of(context)
               .showSnackBar(SnackBar(content: Text(message)));
         },

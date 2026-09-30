@@ -1,6 +1,7 @@
 import 'package:all_in_one/core/network/dio_client.dart';
 import 'package:all_in_one/features/auth/data/models/login_request_model.dart';
 import 'package:all_in_one/features/auth/data/models/login_response_model.dart';
+import 'package:flutter/cupertino.dart';
 
 class AuthRemoteDataSource {
   AuthRemoteDataSource({required this._dioClient});
@@ -8,6 +9,7 @@ class AuthRemoteDataSource {
   final DioClient _dioClient;
 
   Future<LoginResponseModel> login(LoginRequestModel request) async {
+    debugPrint("AuthRemoteDataSource Called");
     final response = await _dioClient.post<Map<String, dynamic>>(
       '/auth/login',
       data: request.toJson(),

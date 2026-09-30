@@ -3,7 +3,6 @@
 //     final userModel = userModelFromJson(jsonString);
 
 import 'dart:convert';
-import 'dart:ffi';
 
 import 'package:all_in_one/features/auth/domain/entities/user.dart';
 

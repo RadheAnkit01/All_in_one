@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 class User {
   const User({
     required this.fullPhoneNUmber,

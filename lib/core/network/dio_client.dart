@@ -16,7 +16,13 @@ class DioClient {
           responseType: ResponseType.json,
         ),
       ) {
-    _dio.interceptors.add(AuthInterceptor(tokenStorage: tokenStorage));
+    _dio.interceptors.add(
+      AuthInterceptor(
+        tokenStorage: tokenStorage,
+        baseUrl: config.baseUrl,
+        dio: _dio,
+      ),
+    );
   }
 
   final Dio _dio;
@@ -31,6 +37,26 @@ class DioClient {
       return await _dio.post<T>(
         path,
         data: data,
+        queryParameters: queryParameters,
+        options: options,
+      );
+    } on DioException catch (error) {
+      throw DioErrorMapper.map(error);
+    } on Failure {
+      rethrow;
+    } catch (_) {
+      throw const UnknownFailure();
+    }
+  }
+
+  Future<Response<T>> get<T>(
+    String path, {
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
+    try {
+      return await _dio.get<T>(
+        path,
         queryParameters: queryParameters,
         options: options,
       );

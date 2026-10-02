@@ -10,7 +10,7 @@ final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
 });
 
 final authLocalDataSourceProvider = Provider<AuthLocalDataSource>((ref) {
-  return AuthLocalDataSource(secureStorage: ref.watch(secureStorageProvider));
+  return AuthLocalDataSource(tokenStorage: ref.watch(tokenStorageProvider));
 });
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {

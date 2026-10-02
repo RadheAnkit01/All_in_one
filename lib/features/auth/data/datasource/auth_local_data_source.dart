@@ -1,37 +1,27 @@
-import 'package:all_in_one/core/storage/secure_storage.dart';
-import 'package:all_in_one/features/auth/domain/entities/auth_session.dart';
+import '../../../../core/storage/token_storage.dart';
+import '../../domain/entities/auth_session.dart';
 
 class AuthLocalDataSource {
-  AuthLocalDataSource({required this._secureStorage});
+  AuthLocalDataSource({required this._tokenStorage});
 
-  final SecureStorage _secureStorage;
+  final TokenStorage _tokenStorage;
 
-  static const _accessTokenKey = 'auth_access_token';
-  static const _refreshTokenKey = 'auth_refresh_token';
-
-  Future<void> saveSession(AuthSession session) async {
-    await _secureStorage.write(
-      key: _accessTokenKey,
-      value: session.accessToken,
-    );
-
-    await _secureStorage.write(
-      key: _refreshTokenKey,
-      value: session.refreshToken,
+  Future<void> saveSession(AuthSession session) {
+    return _tokenStorage.saveTokens(
+      accessToken: session.accessToken,
+      refreshToken: session.refreshToken,
     );
   }
 
   Future<String?> getAccessToken() {
-    return _secureStorage.read(key: _accessTokenKey);
+    return _tokenStorage.getAccessToken();
   }
 
   Future<String?> getRefreshToken() {
-    return _secureStorage.read(key: _refreshTokenKey);
+    return _tokenStorage.getRefreshToken();
   }
 
-  Future<void> clearSession() async {
-    await _secureStorage.delete(key: _accessTokenKey);
-
-    await _secureStorage.delete(key: _refreshTokenKey);
+  Future<void> clearSession() {
+    return _tokenStorage.clearTokens();
   }
 }

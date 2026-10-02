@@ -13,7 +13,8 @@ final appConfigProvider = Provider<AppConfig>((ref) {
 
 final dioClientProvider = Provider<DioClient>((ref) {
   final config = ref.watch(appConfigProvider);
-  return DioClient(config: config);
+  final secureStorage = ref.watch(secureStorageProvider);
+  return DioClient(config: config, secureStorage: secureStorage);
 });
 
 final secureStorageProvider = Provider<SecureStorage>((ref) {

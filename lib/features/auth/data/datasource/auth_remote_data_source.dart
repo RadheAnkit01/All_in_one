@@ -2,6 +2,7 @@ import 'package:all_in_one/core/network/dio_client.dart';
 import 'package:all_in_one/core/network/request_options.dart';
 import 'package:all_in_one/features/auth/data/models/login_request_model.dart';
 import 'package:all_in_one/features/auth/data/models/login_response_model.dart';
+import 'package:all_in_one/features/auth/data/models/user_model.dart';
 import 'package:flutter/material.dart';
 
 class AuthRemoteDataSource {
@@ -18,5 +19,14 @@ class AuthRemoteDataSource {
     );
 
     return LoginResponseModel.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  Future<UserModel> getCurrentUser() async {
+    final response = await _dioClient.get<Map<String, dynamic>>(
+      '/users/me',
+      options: RequestOptionsConfig.authenticated(),
+    );
+
+    return UserModel.fromJson(response.data!);
   }
 }

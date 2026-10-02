@@ -2,7 +2,7 @@ import 'package:all_in_one/core/errors/failure.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../providers/login_provider.dart';
+import '../providers/auth_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -33,7 +33,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
 
     await ref
-        .read(loginProvider.notifier)
+        .read(authProvider.notifier)
         .login(
           fullPhoneNumber: _fullPhoneController.text.trim(),
           password: _passwordController.text,
@@ -42,9 +42,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final loginState = ref.watch(loginProvider);
+    final authState = ref.watch(authProvider);
 
-    ref.listen(loginProvider, (previous, next) {
+    ref.listen(authProvider, (previous, next) {
       next.whenOrNull(
         data: (session) {
           if (session == null) return;
@@ -99,8 +99,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 24),
               FilledButton(
-                onPressed: loginState.isLoading ? null : _login,
-                child: loginState.isLoading
+                onPressed: authState.isLoading ? null : _login,
+                child: authState.isLoading
                     ? const CircularProgressIndicator()
                     : const Text('Login'),
               ),

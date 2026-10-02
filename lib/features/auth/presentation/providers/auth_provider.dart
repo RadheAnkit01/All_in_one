@@ -1,20 +1,23 @@
 import 'dart:async';
 
 import 'package:all_in_one/features/auth/auth_provider.dart';
-import 'package:all_in_one/features/auth/domain/entities/auth_session.dart';
 import 'package:all_in_one/features/auth/domain/repositories/auth_repositories.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final loginProvider = AsyncNotifierProvider<LoginNotifier, AuthSession?>(
-  LoginNotifier.new,
+import '../../domain/entities/auth_session.dart';
+
+final authProvider = AsyncNotifierProvider<AuthNotifier, AuthSession?>(
+  AuthNotifier.new,
 );
 
-class LoginNotifier extends AsyncNotifier<AuthSession?> {
+class AuthNotifier extends AsyncNotifier<AuthSession?> {
   late final AuthRepository _authRepository;
+
   @override
-  FutureOr<AuthSession?> build() {
+  Future<AuthSession?> build() async {
     _authRepository = ref.read(authRepositoryProvider);
-    return null;
+
+    return _authRepository.restoreSession();
   }
 
   Future<void> login({
@@ -22,11 +25,26 @@ class LoginNotifier extends AsyncNotifier<AuthSession?> {
     required String password,
   }) async {
     state = const AsyncLoading();
+
     state = await AsyncValue.guard(() {
       return _authRepository.login(
         fullPhoneNumber: fullPhoneNumber,
         password: password,
       );
     });
+  }
+
+  Future<void> logout() async {
+    state = const AsyncLoading();
+
+    state = await AsyncValue.guard(() async {
+      await _authRepository.logout();
+
+      return null;
+    });
+  }
+
+  Future<void> retry() async {
+    ref.invalidateSelf();
   }
 }

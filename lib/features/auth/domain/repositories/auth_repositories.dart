@@ -5,4 +5,7 @@ abstract interface class AuthRepository {
     required String fullPhoneNumber,
     required String password,
   });
+  Future<AuthSession?> restoreSession();
+
+  Future<void> logout();
 }

@@ -97,11 +97,18 @@ class AuthInterceptor extends Interceptor {
 
     _refreshFuture = future;
 
-    future.whenComplete(() {
-      if (identical(_refreshFuture, future)) {
-        _refreshFuture = null;
-      }
-    });
+    future.then(
+      (_) {
+        if (identical(_refreshFuture, future)) {
+          _refreshFuture = null;
+        }
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        if (identical(_refreshFuture, future)) {
+          _refreshFuture = null;
+        }
+      },
+    );
 
     return future;
   }

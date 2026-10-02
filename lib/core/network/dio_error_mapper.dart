@@ -19,6 +19,7 @@ class DioErrorMapper {
 
     switch (statusCode!) {
       case 401:
+      case 498:
         return const UnauthorizedFailure();
 
       case 404:

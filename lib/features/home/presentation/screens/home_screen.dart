@@ -1,4 +1,5 @@
 // import 'package:all_in_one/app/provider/app_provider.dart';
+import 'package:all_in_one/features/auth/presentation/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -19,7 +20,29 @@ class HomeScreen extends ConsumerWidget {
           child: const Text('Go to Profile'),
         ),
       ),
-      // body: Center(child: Text(dioClient.dio.options.baseUrl)),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(color: Colors.blue),
+              child: Text('Drawer Header'),
+            ),
+            ListTile(
+              title: const Text('Profile'),
+              onTap: () {
+                context.go('/profile');
+              },
+            ),
+            ListTile(
+              title: const Text('Logout'),
+              onTap: () {
+                ref.read(authProvider.notifier).logout();
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

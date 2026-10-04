@@ -1,4 +1,4 @@
-import 'package:all_in_one/core/errors/failure.dart';
+import 'package:all_in_one/core/errors/app_failures.dart';
 import 'package:all_in_one/features/auth/data/datasource/auth_local_data_source.dart';
 import 'package:all_in_one/features/auth/data/datasource/auth_remote_data_source.dart';
 import 'package:all_in_one/features/auth/data/models/login_request_model.dart';
@@ -19,7 +19,7 @@ class AuthRepositoryImpl implements AuthRepository {
     required String fullPhoneNumber,
     required String password,
   }) async {
-    debugPrint("authRepo called");
+    debugPrint("AuthRepositoryImpl login Called");
     final request = LoginRequestModel(
       fullPhoneNumber: fullPhoneNumber,
       password: password,
@@ -38,6 +38,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<AuthSession?> restoreSession() async {
+    debugPrint("AuthRepositoryImpl restoreSession Called");
     final accessToken = await _localDataSource.getAccessToken();
 
     final refreshToken = await _localDataSource.getRefreshToken();
@@ -76,6 +77,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> logout() {
+    debugPrint("AuthRepositoryImpl logout Called");
     return _localDataSource.clearSession();
   }
 }

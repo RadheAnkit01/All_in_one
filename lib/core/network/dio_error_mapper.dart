@@ -1,48 +1,45 @@
-import 'package:all_in_one/core/errors/failure.dart';
 import 'package:dio/dio.dart';
+
+import '../errors/app_failures.dart';
+import '../errors/failure.dart';
 
 class DioErrorMapper {
   const DioErrorMapper._();
 
-  static Failure map(DioException exception) {
-    if (exception.type == DioExceptionType.connectionTimeout ||
-        exception.type == DioExceptionType.sendTimeout ||
-        exception.type == DioExceptionType.receiveTimeout) {
-      return const TimeoutFailure();
-    }
+  static Failure map(DioException error) {
+    final statusCode = error.response?.statusCode;
 
-    if (exception.type == DioExceptionType.connectionError) {
-      return const NetworkFailure();
-    }
-
-    final statusCode = exception.response?.statusCode;
-
-    switch (statusCode!) {
+    switch (statusCode) {
       case 401:
       case 498:
         return const UnauthorizedFailure();
 
-      case 404:
-        return const NotFoundFailure();
-
       case 400:
       case 422:
-        return ValidationFailure(
-          _extractMessage(exception) ?? 'The request contains invalid data.',
-        );
+        return ValidationFailure(message: _extractMessage(error));
 
-      case >= 500:
+      case 500:
+      case 502:
+      case 503:
+      case 504:
         return const ServerFailure();
 
       default:
-        return UnknownFailure(
-          _extractMessage(exception) ?? 'Something went wrong.',
-        );
+        switch (error.type) {
+          case DioExceptionType.connectionTimeout:
+          case DioExceptionType.sendTimeout:
+          case DioExceptionType.receiveTimeout:
+          case DioExceptionType.connectionError:
+            return const NetworkFailure();
+
+          default:
+            return const UnknownFailure();
+        }
     }
   }
 
-  static String? _extractMessage(DioException exception) {
-    final data = exception.response?.data;
+  static String _extractMessage(DioException error) {
+    final data = error.response?.data;
 
     if (data is Map<String, dynamic>) {
       final message = data['message'];
@@ -52,6 +49,6 @@ class DioErrorMapper {
       }
     }
 
-    return null;
+    return 'Invalid request.';
   }
 }

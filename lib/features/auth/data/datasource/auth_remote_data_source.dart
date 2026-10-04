@@ -11,7 +11,7 @@ class AuthRemoteDataSource {
   final DioClient _dioClient;
 
   Future<LoginResponseModel> login(LoginRequestModel request) async {
-    debugPrint("AuthRemoteDataSource Called");
+    debugPrint("AuthRemoteDataSource login Called");
     final response = await _dioClient.post<Map<String, dynamic>>(
       '/auth/login',
       data: request.toJson(),
@@ -22,6 +22,7 @@ class AuthRemoteDataSource {
   }
 
   Future<UserModel> getCurrentUser() async {
+    debugPrint("AuthRemoteDataSource getCurrentUser Called");
     final response = await _dioClient.get<Map<String, dynamic>>(
       '/users/me',
       options: RequestOptionsConfig.authenticated(),

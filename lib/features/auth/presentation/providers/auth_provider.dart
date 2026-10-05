@@ -24,14 +24,20 @@ class AuthNotifier extends AsyncNotifier<AuthSession?> {
     required String fullPhoneNumber,
     required String password,
   }) async {
-    state = const AsyncLoading();
+    ref.read(loginLoadingProvider.notifier).state = true;
 
-    state = await AsyncValue.guard(() {
-      return _authRepository.login(
+    try {
+      final session = await _authRepository.login(
         fullPhoneNumber: fullPhoneNumber,
         password: password,
       );
-    });
+
+      state = AsyncData(session);
+    } catch (error, stackTrace) {
+      state = AsyncError(error, stackTrace);
+    } finally {
+      ref.read(loginLoadingProvider.notifier).state = false;
+    }
   }
 
   Future<void> logout() async {

@@ -5,6 +5,10 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    debugPrint("SplashScreen : build");
+    return Scaffold(
+      appBar: AppBar(title: const Text('Splash Screen')),
+      body: Center(child: CircularProgressIndicator()),
+    );
   }
 }

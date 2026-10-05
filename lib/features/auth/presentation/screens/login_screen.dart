@@ -1,4 +1,5 @@
 import 'package:all_in_one/core/errors/failure.dart';
+import 'package:all_in_one/features/auth/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -42,7 +43,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authProvider);
+    final isLoggingIn = ref.watch(loginLoadingProvider);
 
     ref.listen(authProvider, (previous, next) {
       next.whenOrNull(
@@ -99,8 +100,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 24),
               FilledButton(
-                onPressed: authState.isLoading ? null : _login,
-                child: authState.isLoading
+                onPressed: isLoggingIn ? null : _login,
+                child: isLoggingIn
                     ? const CircularProgressIndicator()
                     : const Text('Login'),
               ),

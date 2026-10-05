@@ -4,6 +4,7 @@ import 'package:all_in_one/features/auth/data/datasource/auth_remote_data_source
 import 'package:all_in_one/features/auth/data/repositories/auth_repositories_impl.dart';
 import 'package:all_in_one/features/auth/domain/repositories/auth_repositories.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
   return AuthRemoteDataSource(dioClient: ref.watch(dioClientProvider));
@@ -18,4 +19,8 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
     remoteDataSource: ref.watch(authRemoteDataSourceProvider),
     localDataSource: ref.watch(authLocalDataSourceProvider),
   );
+});
+
+final loginLoadingProvider = StateProvider<bool>((ref) {
+  return false;
 });

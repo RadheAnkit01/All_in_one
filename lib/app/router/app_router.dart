@@ -44,7 +44,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final authState = ref.read(authProvider);
 
       final isLoading = authState.isLoading;
-      final hasError = authState.hasError;
       final isAuthenticated = authState.value != null;
 
       final location = state.matchedLocation;
@@ -53,10 +52,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final isLogin = location == '/login';
 
       if (isLoading) {
-        return isSplash ? null : '/splash';
-      }
-
-      if (hasError) {
         return isSplash ? null : '/splash';
       }
 

@@ -1,5 +1,6 @@
 import 'package:all_in_one/core/errors/failure.dart';
 import 'package:all_in_one/features/auth/auth_provider.dart';
+import 'package:all_in_one/features/auth/domain/entities/auth_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -45,24 +46,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final isLoggingIn = ref.watch(loginLoadingProvider);
 
-    ref.listen(authProvider, (previous, next) {
-      next.whenOrNull(
-        data: (session) {
-          if (session == null) return;
+    ref.listen<AuthSession?>(authProvider.select((value) => value.value), (
+      previous,
+      session,
+    ) {
+      if (session == null) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Welcome ${session.user.fname}')));
+    });
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Welcome ${session.user.fname}')),
-          );
-        },
-        error: (error, stackTrace) {
-          final message = error is Failure
-              ? error.message
-              : "something went wrong";
-          debugPrint("ErrorInLoginScreen : $error");
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(message)));
-        },
-      );
+    ref.listen<Failure?>(loginErrorProvider, (previous, failure) {
+      if (failure == null) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(failure.message)));
     });
 
     return Scaffold(

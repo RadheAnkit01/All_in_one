@@ -1,4 +1,5 @@
 import 'package:all_in_one/app/provider/app_provider.dart';
+import 'package:all_in_one/core/errors/failure.dart';
 import 'package:all_in_one/features/auth/data/datasource/auth_local_data_source.dart';
 import 'package:all_in_one/features/auth/data/datasource/auth_remote_data_source.dart';
 import 'package:all_in_one/features/auth/data/repositories/auth_repositories_impl.dart';
@@ -23,4 +24,7 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 
 final loginLoadingProvider = StateProvider<bool>((ref) {
   return false;
+});
+final loginErrorProvider = StateProvider<Failure?>((ref) {
+  return null;
 });

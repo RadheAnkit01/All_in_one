@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:all_in_one/core/errors/app_failures.dart';
+import 'package:all_in_one/core/errors/failure.dart';
 import 'package:all_in_one/features/auth/auth_provider.dart';
 import 'package:all_in_one/features/auth/domain/repositories/auth_repositories.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,6 +27,7 @@ class AuthNotifier extends AsyncNotifier<AuthSession?> {
     required String password,
   }) async {
     ref.read(loginLoadingProvider.notifier).state = true;
+    ref.read(loginErrorProvider.notifier).state = null;
 
     try {
       final session = await _authRepository.login(
@@ -33,8 +36,10 @@ class AuthNotifier extends AsyncNotifier<AuthSession?> {
       );
 
       state = AsyncData(session);
-    } catch (error, stackTrace) {
-      state = AsyncError(error, stackTrace);
+    } on Failure catch (failure) {
+      ref.read(loginErrorProvider.notifier).state = failure;
+    } catch (_) {
+      ref.read(loginErrorProvider.notifier).state = const UnknownFailure();
     } finally {
       ref.read(loginLoadingProvider.notifier).state = false;
     }

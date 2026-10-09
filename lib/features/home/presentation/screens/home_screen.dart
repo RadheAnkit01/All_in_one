@@ -13,6 +13,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final session = ref.watch(authProvider).value;
     final isLoggingOut = ref.watch(logoutLoadingProvider);
+    final currentUserAsync = ref.watch(currentUserProvider);
 
     ref.listen<Failure?>(logoutErrorProvider, (previous, failure) {
       if (failure == null) return;
@@ -41,21 +42,46 @@ class HomeScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const SizedBox(width: double.infinity),
-          Text('Welcome to the Home Screen!'),
-          Text('Hello, ${session?.user.fname ?? "User"}!'),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              context.go('/profile');
-            },
-            child: const Text('Go to Profile'),
-          ),
-        ],
+      body: currentUserAsync.when(
+        data: (user) => Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(width: double.infinity),
+            Text('Hello, ${session?.user.fname ?? "User"}!'),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                context.go('/profile');
+              },
+              child: const Text('Go to Profile'),
+            ),
+          ],
+        ),
+        loading: () {
+          return const Center(child: CircularProgressIndicator());
+        },
+        error: (error, stackTrace) {
+          final message = error is Failure
+              ? error.message
+              : 'Unable to load your profile.';
+
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(message),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () {
+                    ref.invalidate(currentUserProvider);
+                  },
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          );
+        },
       ),
       drawer: Drawer(
         child: ListView(

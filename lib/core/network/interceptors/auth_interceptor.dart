@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/rendering.dart';
 
 import '../../storage/token_storage.dart';
 
@@ -36,6 +37,11 @@ class AuthInterceptor extends Interceptor {
     }
 
     final accessToken = await _tokenStorage.getAccessToken();
+
+    debugPrint(
+      'AuthInterceptor: token attached to '
+      '${options.method} ${options.path}',
+    );
 
     if (accessToken != null && accessToken.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $accessToken';

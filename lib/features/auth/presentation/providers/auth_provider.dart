@@ -3,11 +3,17 @@ import 'dart:async';
 import 'package:all_in_one/core/errors/app_failures.dart';
 import 'package:all_in_one/core/errors/failure.dart';
 import 'package:all_in_one/features/auth/auth_provider.dart';
+import 'package:all_in_one/features/auth/domain/entities/user.dart';
 import 'package:all_in_one/features/auth/domain/repositories/auth_repositories.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/entities/auth_session.dart';
+
+final currentUserProvider = FutureProvider.autoDispose<User>((ref) {
+  final repository = ref.watch(authRepositoryProvider);
+  return repository.getCurrentUser();
+});
 
 final authProvider = AsyncNotifierProvider<AuthNotifier, AuthSession?>(
   AuthNotifier.new,

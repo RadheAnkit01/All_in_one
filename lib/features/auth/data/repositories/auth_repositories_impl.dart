@@ -3,6 +3,7 @@ import 'package:all_in_one/features/auth/data/datasource/auth_local_data_source.
 import 'package:all_in_one/features/auth/data/datasource/auth_remote_data_source.dart';
 import 'package:all_in_one/features/auth/data/models/login_request_model.dart';
 import 'package:all_in_one/features/auth/domain/entities/auth_session.dart';
+import 'package:all_in_one/features/auth/domain/entities/user.dart';
 import 'package:all_in_one/features/auth/domain/repositories/auth_repositories.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -73,6 +74,13 @@ class AuthRepositoryImpl implements AuthRepository {
 
       return null;
     }
+  }
+
+  @override
+  Future<User> getCurrentUser() async {
+    debugPrint("AuthRepositoryImpl getCurrentUser Called");
+    final user = await _remoteDataSource.getCurrentUser();
+    return user.toEntity();
   }
 
   @override

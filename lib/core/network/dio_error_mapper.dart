@@ -12,7 +12,7 @@ class DioErrorMapper {
     switch (statusCode) {
       case 401:
       case 498:
-        return const UnauthorizedFailure();
+        return UnauthorizedFailure(message: _extractMessage(error));
 
       case 400:
       case 422:
@@ -49,6 +49,6 @@ class DioErrorMapper {
       }
     }
 
-    return 'Invalid request.';
+    return 'Invalid request or Something went wrong.';
   }
 }

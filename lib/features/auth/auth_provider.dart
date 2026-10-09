@@ -28,3 +28,11 @@ final loginLoadingProvider = StateProvider<bool>((ref) {
 final loginErrorProvider = StateProvider<Failure?>((ref) {
   return null;
 });
+
+final logoutLoadingProvider = StateProvider<bool>((ref) {
+  return false;
+});
+
+final logoutErrorProvider = StateProvider<Failure?>((ref) {
+  return null;
+});

@@ -4,6 +4,7 @@ import 'package:all_in_one/core/errors/app_failures.dart';
 import 'package:all_in_one/core/errors/failure.dart';
 import 'package:all_in_one/features/auth/auth_provider.dart';
 import 'package:all_in_one/features/auth/domain/repositories/auth_repositories.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/entities/auth_session.dart';
@@ -46,13 +47,21 @@ class AuthNotifier extends AsyncNotifier<AuthSession?> {
   }
 
   Future<void> logout() async {
-    state = const AsyncLoading();
+    ref.read(logoutLoadingProvider.notifier).state = true;
+    ref.read(logoutErrorProvider.notifier).state = null;
 
-    state = await AsyncValue.guard(() async {
+    try {
       await _authRepository.logout();
-
-      return null;
-    });
+      state = const AsyncData(null);
+    } on Failure catch (failure) {
+      ref.read(logoutErrorProvider.notifier).state = failure;
+    } catch (error, stackTrace) {
+      debugPrint('Logout failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
+      ref.read(logoutErrorProvider.notifier).state = const UnknownFailure();
+    } finally {
+      ref.read(logoutLoadingProvider.notifier).state = false;
+    }
   }
 
   Future<void> retry() async {

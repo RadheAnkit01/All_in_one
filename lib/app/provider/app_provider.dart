@@ -1,4 +1,5 @@
 import 'package:all_in_one/app/config/app_config.dart';
+import 'package:all_in_one/app/provider/session_expiry_provider.dart';
 import 'package:all_in_one/core/network/dio_client.dart';
 import 'package:all_in_one/core/network/interceptors/auth_interceptor.dart';
 import 'package:all_in_one/core/storage/flutter_secure_storage_service.dart';
@@ -32,6 +33,9 @@ final dioClientProvider = Provider<DioClient>((ref) {
       dio: dio,
       baseUrl: config.baseUrl,
       tokenStorage: tokenStorage,
+      onSessionExpired: () {
+        ref.read(sessionExpiryProvider.notifier).notifyExpired();
+      },
     ),
   );
   return DioClient(dio: dio);

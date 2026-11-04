@@ -8,6 +8,7 @@ class AuthInterceptor extends Interceptor {
     required this._dio,
     required String baseUrl,
     required this._tokenStorage,
+    required this._onSessionExpired,
   }) : _refreshDio = Dio(
          BaseOptions(
            baseUrl: baseUrl,
@@ -21,6 +22,7 @@ class AuthInterceptor extends Interceptor {
   final Dio _dio;
   final Dio _refreshDio;
   final TokenStorage _tokenStorage;
+  final void Function() _onSessionExpired;
 
   Future<void>? _refreshFuture;
 
@@ -87,6 +89,10 @@ class AuthInterceptor extends Interceptor {
       handler.resolve(response);
     } on DioException catch (refreshError) {
       handler.next(refreshError);
+      final statusCode = refreshError.response?.statusCode;
+      if (statusCode == 401 || statusCode == 498) {
+        await _expireSession();
+      }
     } catch (_) {
       handler.next(err);
     }
@@ -123,9 +129,9 @@ class AuthInterceptor extends Interceptor {
     final refreshToken = await _tokenStorage.getRefreshToken();
 
     if (refreshToken == null || refreshToken.isEmpty) {
+      await _expireSession();
       throw StateError('No refresh token available.');
     }
-
     final response = await _refreshDio.post<Map<String, dynamic>>(
       '/auth/refresh',
       data: {'refreshToken': refreshToken},
@@ -152,5 +158,15 @@ class AuthInterceptor extends Interceptor {
       accessToken: accessToken,
       refreshToken: newRefreshToken,
     );
+  }
+
+  Future<void> _expireSession() async {
+    try {
+      await _tokenStorage.clearTokens();
+    } catch (_) {
+      // Still invalidate the in-memory session if storage cleanup fails.
+    }
+
+    _onSessionExpired();
   }
 }

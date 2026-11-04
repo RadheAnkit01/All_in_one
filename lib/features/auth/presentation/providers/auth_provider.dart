@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:all_in_one/app/provider/session_expiry_provider.dart';
 import 'package:all_in_one/core/errors/app_failures.dart';
 import 'package:all_in_one/core/errors/failure.dart';
 import 'package:all_in_one/features/auth/auth_provider.dart';
@@ -24,6 +25,12 @@ class AuthNotifier extends AsyncNotifier<AuthSession?> {
 
   @override
   Future<AuthSession?> build() async {
+    ref.listen<int>(sessionExpiryProvider, (previous, next) {
+      if (next > (previous ?? 0)) {
+        state = const AsyncData<AuthSession?>(null);
+      }
+    });
+
     _authRepository = ref.read(authRepositoryProvider);
 
     return _authRepository.restoreSession();

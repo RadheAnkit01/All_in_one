@@ -1,5 +1,5 @@
 import 'package:all_in_one/core/errors/failure.dart';
-import 'package:all_in_one/features/auth/auth_provider.dart';
+import 'package:all_in_one/features/auth/auth_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

@@ -7,6 +7,7 @@ import 'package:all_in_one/core/storage/secure_storage.dart';
 import 'package:all_in_one/core/storage/secure_token_storage.dart';
 import 'package:all_in_one/core/storage/token_storage.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final appConfigProvider = Provider<AppConfig>((ref) {
@@ -17,6 +18,11 @@ final appConfigProvider = Provider<AppConfig>((ref) {
 });
 
 final dioClientProvider = Provider<DioClient>((ref) {
+  debugPrint('🟢 DioClientProvider CREATED');
+
+  ref.onDispose(() {
+    debugPrint('🔴 DioClientProvider DISPOSED');
+  });
   final config = ref.watch(appConfigProvider);
   final tokenStorage = ref.watch(tokenStorageProvider);
   final dio = Dio(

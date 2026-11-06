@@ -1,3 +1,4 @@
+import 'package:all_in_one/features/auth/presentation/screens/session_restore_error_screen.dart';
 import 'package:all_in_one/features/auth/presentation/screens/splash_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,31 +40,67 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return const ProfileScreen();
         },
       ),
+      GoRoute(
+        path: '/session-error',
+        builder: (context, state) {
+          return const SessionRestoreErrorScreen();
+        },
+      ),
     ],
+    // redirect: (context, state) {
+    //   final authState = ref.read(authProvider);
+
+    //   final isLoading = authState.isLoading;
+    //   final isAuthenticated = authState.value != null;
+
+    //   final location = state.matchedLocation;
+
+    //   final isSplash = location == '/splash';
+    //   final isLogin = location == '/login';
+
+    //   if (isLoading) {
+    //     return isSplash ? null : '/splash';
+    //   }
+
+    //   if (!isAuthenticated) {
+    //     return isLogin ? null : '/login';
+    //   }
+
+    //   if (isAuthenticated && (isLogin || isSplash)) {
+    //     return '/';
+    //   }
+
+    //   return null;
+    // },
     redirect: (context, state) {
       final authState = ref.read(authProvider);
-
-      final isLoading = authState.isLoading;
-      final isAuthenticated = authState.value != null;
 
       final location = state.matchedLocation;
 
       final isSplash = location == '/splash';
       final isLogin = location == '/login';
+      final isSessionError = location == '/session-error';
 
-      if (isLoading) {
+      // If we have an existing value, use it.
+      if (authState.hasValue) {
+        final isAuthenticated = authState.value != null;
+        if (!isAuthenticated) {
+          return isLogin ? null : '/login';
+        }
+        if (isLogin || isSplash || isSessionError) {
+          return '/';
+        }
+        return null;
+      }
+      // Session restoration is still running.
+      if (authState.isLoading) {
         return isSplash ? null : '/splash';
       }
-
-      if (!isAuthenticated) {
-        return isLogin ? null : '/login';
+      // Session verification failed. Do NOT log the user out.
+      if (authState.hasError) {
+        return isSessionError ? null : '/session-error';
       }
-
-      if (isAuthenticated && (isLogin || isSplash)) {
-        return '/';
-      }
-
-      return null;
+      return '/splash';
     },
   );
 });

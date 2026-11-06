@@ -3,37 +3,33 @@ import 'dart:async';
 import 'package:all_in_one/app/provider/session_expiry_provider.dart';
 import 'package:all_in_one/core/errors/app_failures.dart';
 import 'package:all_in_one/core/errors/failure.dart';
-import 'package:all_in_one/features/auth/auth_provider.dart';
-import 'package:all_in_one/features/auth/domain/entities/user.dart';
-import 'package:all_in_one/features/auth/domain/repositories/auth_repositories.dart';
+import 'package:all_in_one/core/network/network_retry_policy.dart';
+import 'package:all_in_one/features/auth/auth_providers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/entities/auth_session.dart';
 
-final currentUserProvider = FutureProvider.autoDispose<User>((ref) {
-  final repository = ref.watch(authRepositoryProvider);
-  return repository.getCurrentUser();
-});
-
 final authProvider = AsyncNotifierProvider<AuthNotifier, AuthSession?>(
   AuthNotifier.new,
+  retry: networkRetryPolicy,
 );
 
 class AuthNotifier extends AsyncNotifier<AuthSession?> {
-  late final AuthRepository _authRepository;
-
   @override
   Future<AuthSession?> build() async {
+    debugPrint('🔵 AuthNotifier BUILD');
+
+    ref.onDispose(() {
+      debugPrint('🔴 AuthNotifier DISPOSED');
+    });
     ref.listen<int>(sessionExpiryProvider, (previous, next) {
       if (next > (previous ?? 0)) {
         state = const AsyncData<AuthSession?>(null);
       }
     });
 
-    _authRepository = ref.read(authRepositoryProvider);
-
-    return _authRepository.restoreSession();
+    return ref.watch(authRepositoryProvider).restoreSession();
   }
 
   Future<void> login({
@@ -44,11 +40,12 @@ class AuthNotifier extends AsyncNotifier<AuthSession?> {
     ref.read(loginErrorProvider.notifier).state = null;
 
     try {
-      final session = await _authRepository.login(
+      final repository = ref.read(authRepositoryProvider);
+
+      final session = await repository.login(
         fullPhoneNumber: fullPhoneNumber,
         password: password,
       );
-
       state = AsyncData(session);
     } on Failure catch (failure) {
       ref.read(loginErrorProvider.notifier).state = failure;
@@ -64,7 +61,8 @@ class AuthNotifier extends AsyncNotifier<AuthSession?> {
     ref.read(logoutErrorProvider.notifier).state = null;
 
     try {
-      await _authRepository.logout();
+      final repository = ref.read(authRepositoryProvider);
+      await repository.logout();
       state = const AsyncData(null);
     } on Failure catch (failure) {
       ref.read(logoutErrorProvider.notifier).state = failure;
@@ -79,5 +77,13 @@ class AuthNotifier extends AsyncNotifier<AuthSession?> {
 
   Future<void> retry() async {
     ref.invalidateSelf();
+  }
+
+  Future<void> retryRestoreSession() async {
+    state = const AsyncLoading<AuthSession?>();
+
+    state = await AsyncValue.guard(
+      () => ref.read(authRepositoryProvider).restoreSession(),
+    );
   }
 }

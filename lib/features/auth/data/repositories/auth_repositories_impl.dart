@@ -32,7 +32,7 @@ class AuthRepositoryImpl implements AuthRepository {
     await _localDataSource.saveSession(session);
 
     final accessToken = await _localDataSource.getAccessToken();
-    debugPrint(accessToken == null ? "no token" : "token available");
+    debugPrint(accessToken == null ? "token not available" : "token available");
 
     return session;
   }

@@ -1,3 +1,5 @@
+import 'package:flutter/rendering.dart';
+
 import 'secure_storage.dart';
 import 'token_storage.dart';
 
@@ -27,6 +29,7 @@ class SecureTokenStorage implements TokenStorage {
     await _secureStorage.write(key: _accessTokenKey, value: accessToken);
 
     await _secureStorage.write(key: _refreshTokenKey, value: refreshToken);
+    debugPrint("Tokens saved");
   }
 
   @override
@@ -34,5 +37,6 @@ class SecureTokenStorage implements TokenStorage {
     await _secureStorage.delete(key: _accessTokenKey);
 
     await _secureStorage.delete(key: _refreshTokenKey);
+    debugPrint("Tokens cleared");
   }
 }

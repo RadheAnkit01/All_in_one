@@ -87,7 +87,7 @@ class UserModel {
 
   User toEntity() {
     return User(
-      fullPhoneNUmber: fullPhoneNumber,
+      fullPhoneNumber: fullPhoneNumber,
       email: email,
       fname: firstName,
       lname: lastName,

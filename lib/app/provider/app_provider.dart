@@ -1,5 +1,7 @@
 import 'package:all_in_one/app/config/app_config.dart';
 import 'package:all_in_one/app/provider/session_expiry_provider.dart';
+import 'package:all_in_one/core/database/app_database.dart';
+import 'package:all_in_one/core/database/daos/user_dao.dart';
 import 'package:all_in_one/core/network/dio_client.dart';
 import 'package:all_in_one/core/network/interceptors/auth_interceptor.dart';
 import 'package:all_in_one/core/storage/flutter_secure_storage_service.dart';
@@ -53,4 +55,18 @@ final secureStorageProvider = Provider<SecureStorage>((ref) {
 
 final tokenStorageProvider = Provider<TokenStorage>((ref) {
   return SecureTokenStorage(secureStorage: ref.watch(secureStorageProvider));
+});
+
+final appDatabaseProvider = Provider<AppDatabase>((ref) {
+  final database = AppDatabase();
+  ref.onDispose(() {
+    database.close();
+  });
+  return database;
+});
+
+final userDaoProvider = Provider<UserDao>((ref) {
+  final database = ref.watch(appDatabaseProvider);
+
+  return database.userDao;
 });

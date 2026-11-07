@@ -1,6 +1,7 @@
 import 'package:all_in_one/core/errors/app_failures.dart';
 import 'package:all_in_one/features/auth/data/datasource/auth_local_data_source.dart';
 import 'package:all_in_one/features/auth/data/datasource/auth_remote_data_source.dart';
+import 'package:all_in_one/features/auth/data/datasource/user_local_data_source.dart';
 import 'package:all_in_one/features/auth/data/models/login_request_model.dart';
 import 'package:all_in_one/features/auth/domain/entities/auth_session.dart';
 import 'package:all_in_one/features/auth/domain/entities/user.dart';
@@ -11,10 +12,12 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl({
     required this._remoteDataSource,
     required this._localDataSource,
+    required this._userLocalDataSource,
   });
 
   final AuthRemoteDataSource _remoteDataSource;
   final AuthLocalDataSource _localDataSource;
+  final UserLocalDataSource _userLocalDataSource;
   @override
   Future<AuthSession> login({
     required String fullPhoneNumber,
@@ -53,7 +56,7 @@ class AuthRepositoryImpl implements AuthRepository {
     }
 
     try {
-      final user = await _remoteDataSource.getCurrentUser();
+      final user = await getCurrentUser();
 
       final newAccessToken = await _localDataSource.getAccessToken();
 
@@ -67,10 +70,11 @@ class AuthRepositoryImpl implements AuthRepository {
       return AuthSession(
         accessToken: newAccessToken,
         refreshToken: newRefreshToken,
-        user: user.toEntity(),
+        user: user,
       );
     } on UnauthorizedFailure {
       await _localDataSource.clearSession();
+      await _userLocalDataSource.clearCurrentUser();
 
       return null;
     }
@@ -79,13 +83,35 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<User> getCurrentUser() async {
     debugPrint("AuthRepositoryImpl getCurrentUser Called");
-    final user = await _remoteDataSource.getCurrentUser();
-    return user.toEntity();
+    try {
+      // 1. Fetch from backend.
+      final userModel = await _remoteDataSource.getCurrentUser();
+      // 2. Save successful response to SQLite.
+      await _userLocalDataSource.saveCurrentUser(userModel);
+      // 3. Return domain entity.
+      return userModel.toEntity();
+    } on NetworkFailure {
+      // Backend unavailable or connection failed.
+      final cachedUser = await _userLocalDataSource.getCurrentUser();
+      if (cachedUser != null) {
+        return cachedUser;
+      }
+      // No cached data: preserve the original failure.
+      rethrow;
+    } on ServerFailure {
+      // Server returned an unavailable/error response.
+      final cachedUser = await _userLocalDataSource.getCurrentUser();
+      if (cachedUser != null) {
+        return cachedUser;
+      }
+      rethrow;
+    }
   }
 
   @override
-  Future<void> logout() {
+  Future<void> logout() async {
     debugPrint("AuthRepositoryImpl logout Called");
-    return _localDataSource.clearSession();
+    _localDataSource.clearSession();
+    _userLocalDataSource.clearCurrentUser();
   }
 }

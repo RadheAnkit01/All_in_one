@@ -49,7 +49,7 @@ class HomeScreen extends ConsumerWidget {
           const SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
-              context.go('/profile');
+              context.push('/profile');
             },
             child: const Text('Go to Profile'),
           ),
@@ -66,7 +66,7 @@ class HomeScreen extends ConsumerWidget {
             ListTile(
               title: const Text('Profile'),
               onTap: () {
-                context.go('/profile');
+                context.push('/profile');
               },
             ),
             ListTile(

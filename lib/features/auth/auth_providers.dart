@@ -3,6 +3,7 @@ import 'package:all_in_one/core/errors/failure.dart';
 import 'package:all_in_one/core/network/network_retry_policy.dart';
 import 'package:all_in_one/features/auth/data/datasource/auth_local_data_source.dart';
 import 'package:all_in_one/features/auth/data/datasource/auth_remote_data_source.dart';
+import 'package:all_in_one/features/auth/data/datasource/user_local_data_source.dart';
 import 'package:all_in_one/features/auth/data/repositories/auth_repositories_impl.dart';
 import 'package:all_in_one/features/auth/domain/entities/user.dart';
 import 'package:all_in_one/features/auth/domain/repositories/auth_repositories.dart';
@@ -37,6 +38,7 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepositoryImpl(
     remoteDataSource: ref.watch(authRemoteDataSourceProvider),
     localDataSource: ref.watch(authLocalDataSourceProvider),
+    userLocalDataSource: ref.watch(userLocalDataSourceProvider),
   );
 });
 
@@ -53,4 +55,8 @@ final logoutLoadingProvider = StateProvider<bool>((ref) {
 
 final logoutErrorProvider = StateProvider<Failure?>((ref) {
   return null;
+});
+
+final userLocalDataSourceProvider = Provider<UserLocalDataSource>((ref) {
+  return UserLocalDataSource(userDao: ref.watch(userDaoProvider));
 });
